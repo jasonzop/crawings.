@@ -1,92 +1,109 @@
-const buttons = document.querySelectorAll(".add-to-cart");
-const cartContainer = document.getElementById("cart-items");
-const totalDisplay = document.getElementById("cart-total");
-const clearBtn = document.getElementById("clear-cart");
+const cartItemsContainer = document.getElementById("cart-items");
+const cartTotal = document.getElementById("cart-total");
+const clearCartBtn = document.getElementById("clear-cart");
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// ADD TO CART
-buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-        const item = btn.parentElement;
-        const name = item.dataset.name;
-        const price = parseFloat(item.dataset.price);
-
-        const existing = cart.find((i) => i.name === name);
-
-        if (existing) {
-            existing.quantity++;
-        } else {
-            cart.push({ name, price, quantity: 1 });
-        }
-
-        updateCart();
-    });
-});
-
-// INCREASE
-function increaseQty(name) {
-    const item = cart.find(i => i.name === name);
-    if (item) item.quantity++;
-    updateCart();
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// DECREASE
-function decreaseQty(name) {
-    const item = cart.find(i => i.name === name);
-
-    if (item) {
-        item.quantity--;
-        if (item.quantity <= 0) {
-            cart = cart.filter(i => i.name !== name);
-        }
-    }
-
-    updateCart();
-}
-
-// CLEAR CART
-clearBtn.addEventListener("click", () => {
-    cart = [];
-    updateCart();
-});
-
-// UPDATE UI
-function updateCart() {
-    cartContainer.innerHTML = "";
+function renderCart() {
+    cartItemsContainer.innerHTML = "";
 
     if (cart.length === 0) {
-        cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
-        totalDisplay.textContent = "0.00";
-        localStorage.setItem("cart", JSON.stringify(cart));
+        cartItemsContainer.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
+        cartTotal.textContent = "0.00";
         return;
     }
 
     let total = 0;
 
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
         total += item.price * item.quantity;
 
-        const div = document.createElement("div");
-        div.classList.add("cart-item");
+        const cartItem = document.createElement("div");
+        cartItem.className = "cart-item";
 
-        div.innerHTML = `
+        cartItem.innerHTML = `
             <h4>${item.name}</h4>
             <p>$${item.price} x ${item.quantity}</p>
-            <div class="qty-controls">
-                <button class="qty-btn minus">-</button>
-                <button class="qty-btn plus">+</button>
-            </div>
         `;
 
-        div.querySelector(".plus").onclick = () => increaseQty(item.name);
-        div.querySelector(".minus").onclick = () => decreaseQty(item.name);
+        // Quantity controls
+        const qtyControls = document.createElement("div");
+        qtyControls.className = "qty-controls";
 
-        cartContainer.appendChild(div);
+        const minusBtn = document.createElement("button");
+        minusBtn.textContent = "-";
+        minusBtn.className = "qty-btn";
+
+        minusBtn.onclick = () => {
+            if (item.quantity > 1) {
+                item.quantity--;
+            } else {
+                cart.splice(index, 1);
+            }
+            saveCart();
+            renderCart();
+        };
+
+        const plusBtn = document.createElement("button");
+        plusBtn.textContent = "+";
+        plusBtn.className = "qty-btn";
+
+        plusBtn.onclick = () => {
+            item.quantity++;
+            saveCart();
+            renderCart();
+        };
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.className = "remove-btn";
+
+        removeBtn.onclick = () => {
+            cart.splice(index, 1);
+            saveCart();
+            renderCart();
+        };
+
+        qtyControls.appendChild(minusBtn);
+        qtyControls.appendChild(plusBtn);
+
+        cartItem.appendChild(qtyControls);
+        cartItem.appendChild(removeBtn);
+
+        cartItemsContainer.appendChild(cartItem);
     });
 
-    totalDisplay.textContent = total.toFixed(2);
-    localStorage.setItem("cart", JSON.stringify(cart));
+    cartTotal.textContent = total.toFixed(2);
 }
 
-updateCart();
+document.querySelectorAll(".add-to-cart").forEach(button => {
+    button.addEventListener("click", () => {
+        const pizza = button.parentElement;
+        const name = pizza.dataset.name;
+        const price = parseFloat(pizza.dataset.price);
+
+        const existingItem = cart.find(item => item.name === name);
+
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            cart.push({ name, price, quantity: 1 });
+        }
+
+        saveCart();
+        renderCart();
+    });
+});
+
+clearCartBtn.addEventListener("click", () => {
+    cart = [];
+    saveCart();
+    renderCart();
+});
+
+// Initial render
+renderCart();
