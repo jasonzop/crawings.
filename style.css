@@ -148,6 +148,7 @@ main{
     text-align: center;
     width: 100%;
     overflow: hidden;
+    transition: transform 0.2s ease;
 }
 
 .pizza-item img {
@@ -169,6 +170,11 @@ main{
 .pizza-item span {
     font-weight: bold;
     font-size: 18px;
+}
+
+.pizza-item:hover {
+    transform: scale(1.03);
+    transition: 0.2s ease;
 }
 
 /* Gallery */
@@ -369,6 +375,16 @@ footer {
         padding: 15px;
     }
 
+    .menu-cart-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cart {
+        width: 100%;
+        max-width: 400px;
+    }
+
     .pizza-item{
         padding: 8px;
         border-radius: 20px;
@@ -508,6 +524,7 @@ footer {
     display: flex;
     gap: 30px;
     padding: 30px;
+    align-items: flex-start;   /* ADD THIS */
 }
 
 .cart {
@@ -517,7 +534,10 @@ footer {
     border: 2px solid #ddd;
     border-radius: 10px;
     height: fit-content;
+    position: sticky;
+    top: 20px;
 }
+
 
 .cart h2 {
     margin-bottom: 15px;
@@ -527,6 +547,7 @@ footer {
 .cart-item {
     border-bottom: 1px solid #ddd;
     padding: 10px 0;
+    margin-bottom: 10px; 
 }
 
 .cart-item h4 {
@@ -560,6 +581,14 @@ footer {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.remove-btn:hover {
+    background-color: #4f4b05;
+}
+
+#clear-cart:hover {
+    background-color: #222;
 }
 
 #clear-cart {
