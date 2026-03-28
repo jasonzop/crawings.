@@ -605,3 +605,23 @@ footer {
     color: gray;
     font-style: italic;
 }
+
+.qty-controls {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.qty-btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #A1200A;
+    color: white;
+    font-weight: bold;
+}
+
+.qty-btn:hover {
+    background-color: #7d1707;
+}

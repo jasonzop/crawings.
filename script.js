@@ -24,9 +24,24 @@ buttons.forEach((btn) => {
     });
 });
 
-// REMOVE ITEM
-function removeItem(name) {
-    cart = cart.filter((item) => item.name !== name);
+// INCREASE
+function increaseQty(name) {
+    const item = cart.find(i => i.name === name);
+    if (item) item.quantity++;
+    updateCart();
+}
+
+// DECREASE
+function decreaseQty(name) {
+    const item = cart.find(i => i.name === name);
+
+    if (item) {
+        item.quantity--;
+        if (item.quantity <= 0) {
+            cart = cart.filter(i => i.name !== name);
+        }
+    }
+
     updateCart();
 }
 
@@ -49,7 +64,7 @@ function updateCart() {
 
     let total = 0;
 
-    cart.forEach((item) => {
+    cart.forEach(item => {
         total += item.price * item.quantity;
 
         const div = document.createElement("div");
@@ -58,10 +73,14 @@ function updateCart() {
         div.innerHTML = `
             <h4>${item.name}</h4>
             <p>$${item.price} x ${item.quantity}</p>
-            <button class="remove-btn">Remove</button>
+            <div class="qty-controls">
+                <button class="qty-btn minus">-</button>
+                <button class="qty-btn plus">+</button>
+            </div>
         `;
 
-        div.querySelector(".remove-btn").onclick = () => removeItem(item.name);
+        div.querySelector(".plus").onclick = () => increaseQty(item.name);
+        div.querySelector(".minus").onclick = () => decreaseQty(item.name);
 
         cartContainer.appendChild(div);
     });
