@@ -3,16 +3,16 @@ const cartContainer = document.getElementById("cart-items");
 const totalDisplay = document.getElementById("cart-total");
 const clearBtn = document.getElementById("clear-cart");
 
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 // ADD TO CART
-buttons.forEach(btn => {
+buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
         const item = btn.parentElement;
         const name = item.dataset.name;
         const price = parseFloat(item.dataset.price);
 
-        const existing = cart.find(i => i.name === name);
+        const existing = cart.find((i) => i.name === name);
 
         if (existing) {
             existing.quantity++;
@@ -26,7 +26,7 @@ buttons.forEach(btn => {
 
 // REMOVE ITEM
 function removeItem(name) {
-    cart = cart.filter(item => item.name !== name);
+    cart = cart.filter((item) => item.name !== name);
     updateCart();
 }
 
@@ -43,12 +43,13 @@ function updateCart() {
     if (cart.length === 0) {
         cartContainer.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
         totalDisplay.textContent = "0.00";
+        localStorage.setItem("cart", JSON.stringify(cart));
         return;
     }
 
     let total = 0;
 
-    cart.forEach(item => {
+    cart.forEach((item) => {
         total += item.price * item.quantity;
 
         const div = document.createElement("div");
@@ -60,10 +61,13 @@ function updateCart() {
             <button class="remove-btn">Remove</button>
         `;
 
-        div.querySelector("button").onclick = () => removeItem(item.name);
+        div.querySelector(".remove-btn").onclick = () => removeItem(item.name);
 
         cartContainer.appendChild(div);
     });
 
     totalDisplay.textContent = total.toFixed(2);
+    localStorage.setItem("cart", JSON.stringify(cart));
 }
+
+updateCart();
