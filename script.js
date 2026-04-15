@@ -8,7 +8,32 @@ function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
 
+function showCartNotification(message) {
+    const oldNote = document.querySelector(".cart-notification");
+    if (oldNote) {
+        oldNote.remove();
+    }
+
+    const note = document.createElement("div");
+    note.className = "cart-notification";
+    note.textContent = message;
+    document.body.appendChild(note);
+
+    setTimeout(() => {
+        note.classList.add("show");
+    }, 10);
+
+    setTimeout(() => {
+        note.classList.remove("show");
+        setTimeout(() => {
+            note.remove();
+        }, 300);
+    }, 2000);
+}
+
 function renderCart() {
+    if (!cartItemsContainer || !cartTotal) return;
+
     cartItemsContainer.innerHTML = "";
 
     if (cart.length === 0) {
@@ -30,7 +55,6 @@ function renderCart() {
             <p>$${item.price} x ${item.quantity}</p>
         `;
 
-        // Quantity controls
         const qtyControls = document.createElement("div");
         qtyControls.className = "qty-controls";
 
@@ -80,13 +104,13 @@ function renderCart() {
     cartTotal.textContent = total.toFixed(2);
 }
 
-document.querySelectorAll(".add-to-cart").forEach(button => {
+document.querySelectorAll(".add-to-cart").forEach((button) => {
     button.addEventListener("click", () => {
         const pizza = button.parentElement;
         const name = pizza.dataset.name;
         const price = parseFloat(pizza.dataset.price);
 
-        const existingItem = cart.find(item => item.name === name);
+        const existingItem = cart.find((item) => item.name === name);
 
         if (existingItem) {
             existingItem.quantity++;
@@ -96,14 +120,16 @@ document.querySelectorAll(".add-to-cart").forEach(button => {
 
         saveCart();
         renderCart();
+        showCartNotification(name + " added to cart!");
     });
 });
 
-clearCartBtn.addEventListener("click", () => {
-    cart = [];
-    saveCart();
-    renderCart();
-});
+if (clearCartBtn) {
+    clearCartBtn.addEventListener("click", () => {
+        cart = [];
+        saveCart();
+        renderCart();
+    });
+}
 
-// Initial render
 renderCart();
